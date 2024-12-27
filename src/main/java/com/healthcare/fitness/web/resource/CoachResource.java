@@ -2,21 +2,22 @@ package com.healthcare.fitness.web.resource;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.healthcare.fitness.dto.Login;
-import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.Coach;
+import com.healthcare.fitness.entity.dto.BookingDTO;
+import com.healthcare.fitness.entity.dto.CoachDTO;
+import com.healthcare.fitness.entity.dto.Login;
 import com.healthcare.fitness.service.CoachService;
 
 @RestController
@@ -26,9 +27,22 @@ public class CoachResource {
 	@Autowired
 	private CoachService coachService;
 	
+	@Autowired
+	private ModelMapper mapper;
 	@PostMapping("/create")
 	public ResponseEntity<Integer> createCoach(@RequestBody Coach coach){
 		Integer id=null;
+		CoachDTO coach1=mapper.map(coach, CoachDTO.class);
+		
+			id=coachService.createCoach(coach1);
+		
+		
+		return new ResponseEntity<Integer>(id,new HttpHeaders(),HttpStatus.CREATED);
+	}
+	@PostMapping(value="/create",params="v=2")
+	public ResponseEntity<Integer> createCoachv2(@RequestBody CoachDTO coach){
+		Integer id=null;
+//		CoachDTO coach1=mapper.map(coach, CoachDTO.class);
 		
 			id=coachService.createCoach(coach);
 		
@@ -55,8 +69,8 @@ public class CoachResource {
 	@GetMapping(value="/{coachId}")
 	public ResponseEntity<Coach> getCoachById(@PathVariable("coachId") Integer coachId )
 	{
-		System.out.println("get coach "+coachId);
-		Coach coach=null;
+//		System.out.println("get coach "+coachId);
+		CoachDTO coach=null;
 		try {
 			coach=coachService.getCoachById(coachId);
 		}
@@ -64,20 +78,34 @@ public class CoachResource {
 		{
 			return  ResponseEntity.notFound().build();
 		}
-		return new ResponseEntity<Coach>(coach,new HttpHeaders(),HttpStatus.FOUND);
+		return new ResponseEntity<Coach>(mapper.map(coach, Coach.class),new HttpHeaders(),HttpStatus.FOUND);
+	}
+	@GetMapping(value="/{coachId}",params="v=2")
+	public ResponseEntity<CoachDTO> getCoachByIdv2(@PathVariable("coachId") Integer coachId )
+	{
+		System.out.println("get coach "+coachId);
+		CoachDTO coach=null;
+		try {
+			coach=coachService.getCoachById(coachId);
+		}
+		catch(Exception ex)
+		{
+			return  ResponseEntity.notFound().build();
+		}
+		return new ResponseEntity<CoachDTO>(coach,new HttpHeaders(),HttpStatus.FOUND);
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<List<Coach>>getAllCoach(){
-		List<Coach> list=coachService.getAllCoaches();
+	public ResponseEntity<List<CoachDTO>>getAllCoach(){
+		List<CoachDTO> list=coachService.getAllCoaches();
 		
-		return new ResponseEntity<List<Coach>>(list,new HttpHeaders(),HttpStatus.OK);
+		return new ResponseEntity<List<CoachDTO>>(list,new HttpHeaders(),HttpStatus.OK);
 	}
 	
 	@GetMapping("/booking/{coachId}")
 	public ResponseEntity<?> getBooking(@PathVariable("coachId") Integer coachId){
 		
-		List<Booking> booking=null;
+		List<BookingDTO> booking=null;
 		
 		try {
 			booking=coachService.getBookingByCoachId(coachId);
@@ -87,7 +115,7 @@ public class CoachResource {
 			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 		}		
 		
-		return new ResponseEntity<List<Booking>>(booking,new HttpHeaders(),HttpStatus.OK);
+		return new ResponseEntity<List<BookingDTO>>(booking,new HttpHeaders(),HttpStatus.OK);
 	}
 
 }

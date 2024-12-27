@@ -1,14 +1,18 @@
 package com.healthcare.fitness.service.Impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.healthcare.fitness.dto.Login;
 import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.User;
+import com.healthcare.fitness.entity.dto.BookingDTO;
+import com.healthcare.fitness.entity.dto.Login;
+import com.healthcare.fitness.entity.dto.UserDTO;
 import com.healthcare.fitness.repository.Bookingrepository;
 import com.healthcare.fitness.repository.UserRepository;
 import com.healthcare.fitness.service.UserService;
@@ -21,16 +25,21 @@ public class UserServiceImpl implements UserService{
 	private UserRepository userRepository;
 	@Autowired
 	private Bookingrepository bookingrepository;
+	
+	@Autowired
+	private ModelMapper mapper;
 	@Override
-	public Integer createUser(User user) {
+	public Integer createUser(UserDTO user) {
 		// TODO Auto-generated method stub
-		User newUser=userRepository.save(user);
+		User newUser=userRepository.save(mapper.map(user,User.class));
+		
 		return newUser.getUserId();
 	}
 	@Override
 	public Boolean loginUser(Login login) throws Exception {
 		// TODO Auto-generated method stub
-		User user=userRepository.findById(login.getId()).orElseThrow(()->new Exception("User Not Found"));
+		User user1=userRepository.findById(login.getId()).orElseThrow(()->new Exception("User Not Found"));
+		UserDTO user=mapper.map(user1, UserDTO.class);
 		if(null==user) {
 		return null;
 		}
@@ -48,18 +57,23 @@ public class UserServiceImpl implements UserService{
 //		return null;
 	}
 	@Override
-	public User getUserById(Integer userId) throws Exception {
+	public UserDTO getUserById(Integer userId) throws Exception {
 		// TODO Auto-generated method stub
-		User user=userRepository.findById(userId).orElseThrow(()->new Exception("User Not Found"));
+		User user1=userRepository.findById(userId).orElseThrow(()->new Exception("User Not Found"));
+		UserDTO user=mapper.map(user1, UserDTO.class);
 		return user;
 	}
 	@Override
-	public List<Booking> getBookingByUserId(Integer userId) throws Exception {
+	public List<BookingDTO> getBookingByUserId(Integer userId) throws Exception {
 		// TODO Auto-generated method stub
 		User user=userRepository.findById(userId).orElseThrow(()->new Exception("User Not Found"));
 		List<Booking> booking=bookingrepository.findByUser(user);
-		
-		return booking;
+		List<BookingDTO> DTOlist=new ArrayList<>();
+		for(Booking book:booking) {
+			BookingDTO dto=mapper.map(book, BookingDTO.class);
+			DTOlist.add(dto);
+		}
+		return DTOlist;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.healthcare.fitness.dto;
+package com.healthcare.fitness.entity.dto;
 
 import lombok.Getter;
 import lombok.Setter;

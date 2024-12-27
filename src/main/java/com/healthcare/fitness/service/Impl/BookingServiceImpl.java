@@ -2,6 +2,7 @@ package com.healthcare.fitness.service.Impl;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.Coach;
 import com.healthcare.fitness.entity.User;
+import com.healthcare.fitness.entity.dto.BookingDTO;
 import com.healthcare.fitness.repository.Bookingrepository;
 import com.healthcare.fitness.repository.CoachRepository;
 import com.healthcare.fitness.repository.UserRepository;
@@ -24,9 +26,11 @@ public class BookingServiceImpl implements BookingService {
 	private UserRepository userRepository;
 	@Autowired
 	private CoachRepository coachRepository;
+	@Autowired
+	private ModelMapper mapper;
 
 	@Override
-	public Boolean appointmentBooking(Integer coachId, Integer userId,Booking book) throws Exception {
+	public Boolean appointmentBooking(Integer coachId, Integer userId,BookingDTO book) throws Exception {
 		// TODO Auto-generated method stub
 		Coach coach=coachRepository.findById(coachId).orElseThrow(()->new Exception("Coach Not Found"));
 		User user=userRepository.findById(userId).orElseThrow(()->new Exception("User Not Found"));
@@ -38,7 +42,8 @@ public class BookingServiceImpl implements BookingService {
 		
 		book.setCoach(coach);
 		book.setUser(user);
-		Booking newBooking=bookingrepository.save(book);
+		Booking booking=mapper.map(book, Booking.class);
+		Booking newBooking=bookingrepository.save(booking);
 		if(null==newBooking.getBookingId()) {
 			return false;
 		}
@@ -46,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public Boolean rescheduleBooking(Integer bookingId,Booking book)throws Exception {
+	public Boolean rescheduleBooking(Integer bookingId,BookingDTO book)throws Exception {
 		// TODO Auto-generated method stub
 		Booking book1=bookingrepository.findById(bookingId).orElseThrow(()-> new Exception("Booking Not Found"));
 		List<Booking> booklist=bookingrepository.findByCoachAndAppointmentAndSlot(book1.getCoach(),book.getAppointment(), book.getSlot());
@@ -57,7 +62,8 @@ public class BookingServiceImpl implements BookingService {
 		}
 		book1.setAppointment(book.getAppointment());
 		book1.setSlot(book.getSlot());
-		Booking newBooking=bookingrepository.save(book1);
+		Booking booking=mapper.map(book, Booking.class);
+		Booking newBooking=bookingrepository.save(booking);
 		if(null==newBooking.getBookingId()) {
 			return false;
 		}
