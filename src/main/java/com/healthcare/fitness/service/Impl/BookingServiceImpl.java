@@ -11,6 +11,7 @@ import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.Coach;
 import com.healthcare.fitness.entity.User;
 import com.healthcare.fitness.entity.dto.BookingDTO;
+import com.healthcare.fitness.exception.BookingIdNotFoundException;
 import com.healthcare.fitness.repository.Bookingrepository;
 import com.healthcare.fitness.repository.CoachRepository;
 import com.healthcare.fitness.repository.UserRepository;
@@ -30,14 +31,14 @@ public class BookingServiceImpl implements BookingService {
 	private ModelMapper mapper;
 
 	@Override
-	public Boolean appointmentBooking(Integer coachId, Integer userId,BookingDTO book) throws Exception {
+	public Boolean appointmentBooking(Integer coachId, Integer userId,BookingDTO book) throws BookingIdNotFoundException {
 		// TODO Auto-generated method stub
-		Coach coach=coachRepository.findById(coachId).orElseThrow(()->new Exception("Coach Not Found"));
-		User user=userRepository.findById(userId).orElseThrow(()->new Exception("User Not Found"));
+		Coach coach=coachRepository.findById(coachId).orElseThrow(()->new BookingIdNotFoundException("Coach Not Found"));
+		User user=userRepository.findById(userId).orElseThrow(()->new BookingIdNotFoundException("User Not Found"));
 		List<Booking> book1=bookingrepository.findByCoachAndAppointmentAndSlot(coach,book.getAppointment(), book.getSlot());
 		System.out.println(book1);
 		if(book1.size()!=0) {
-			throw new Exception("Slot is already booked");
+			throw new BookingIdNotFoundException("Slot is already booked");
 		}
 		
 		book.setCoach(coach);
@@ -51,14 +52,14 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public Boolean rescheduleBooking(Integer bookingId,BookingDTO book)throws Exception {
+	public Boolean rescheduleBooking(Integer bookingId,BookingDTO book)throws BookingIdNotFoundException {
 		// TODO Auto-generated method stub
-		Booking book1=bookingrepository.findById(bookingId).orElseThrow(()-> new Exception("Booking Not Found"));
+		Booking book1=bookingrepository.findById(bookingId).orElseThrow(()-> new BookingIdNotFoundException("Booking Not Found"));
 		List<Booking> booklist=bookingrepository.findByCoachAndAppointmentAndSlot(book1.getCoach(),book.getAppointment(), book.getSlot());
 
 		if(booklist.size()!=0) {
 			
-			throw new Exception("Slot is already booked");
+			throw new BookingIdNotFoundException("Slot is already booked");
 		}
 		book1.setAppointment(book.getAppointment());
 		book1.setSlot(book.getSlot());
@@ -71,9 +72,9 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public Boolean cancelBooking(Integer bookingId)throws Exception {
+	public Boolean cancelBooking(Integer bookingId)throws BookingIdNotFoundException {
 		// TODO Auto-generated method stub
-		Booking book1=bookingrepository.findById(bookingId).orElseThrow(()-> new Exception("Booking Not Found"));
+		Booking book1=bookingrepository.findById(bookingId).orElseThrow(()-> new BookingIdNotFoundException("Booking Not Found"));
 		bookingrepository.deleteById(book1.getBookingId());
 		return true;
 	}

@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.dto.BookingDTO;
+import com.healthcare.fitness.entity.dto.ErrorMessage;
+import com.healthcare.fitness.exception.BookingIdNotFoundException;
 import com.healthcare.fitness.service.BookingService;
 
 @RestController
@@ -24,6 +27,14 @@ public class BookingRestController {
 	private BookingService bookingService;
 	@Autowired
 	private ModelMapper mapper;
+	
+	@ExceptionHandler(BookingIdNotFoundException.class)
+	public ResponseEntity<ErrorMessage> bookingIdNotFoundException(BookingIdNotFoundException error){
+		ErrorMessage msg=new ErrorMessage();
+		msg.setErrorCode(400);
+		msg.setMessage(error.getMessage());
+		return ResponseEntity.badRequest().body(msg);
+	}
 	@PostMapping("/coach/{coachId}/user/{userId}")
 	public ResponseEntity<?> appointmentBooking(@RequestBody Booking book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId ){
 		BookingDTO book1=mapper.map(book,BookingDTO.class);
@@ -63,6 +74,21 @@ public class BookingRestController {
 //			e.printStackTrace();
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+		return new ResponseEntity<Boolean>(resp,new HttpHeaders(),HttpStatus.OK);
+		
+	}
+	
+	@PutMapping(value="/{bookingId}",headers="API-Version=2")
+	public ResponseEntity<?> rescheduleBooking(@RequestBody BookingDTO book,@PathVariable("bookingId") Integer bookingId) throws BookingIdNotFoundException{
+//		BookingDTO book1=mapper.map(book,BookingDTO.class);
+		Boolean resp=false;
+//		try {
+			 resp=bookingService.rescheduleBooking(bookingId,book);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+////			e.printStackTrace();
+//			return ResponseEntity.badRequest().body(e.getMessage());
+//		}
 		return new ResponseEntity<Boolean>(resp,new HttpHeaders(),HttpStatus.OK);
 		
 	}
