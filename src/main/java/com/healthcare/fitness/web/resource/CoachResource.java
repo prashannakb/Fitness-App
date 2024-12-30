@@ -18,7 +18,10 @@ import com.healthcare.fitness.entity.Coach;
 import com.healthcare.fitness.entity.dto.BookingDTO;
 import com.healthcare.fitness.entity.dto.CoachDTO;
 import com.healthcare.fitness.entity.dto.Login;
+import com.healthcare.fitness.exception.CoachNotFoundException;
 import com.healthcare.fitness.service.CoachService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/coach")
@@ -30,7 +33,7 @@ public class CoachResource {
 	@Autowired
 	private ModelMapper mapper;
 	@PostMapping("/create")
-	public ResponseEntity<Integer> createCoach(@RequestBody Coach coach){
+	public ResponseEntity<Integer> createCoach(@Valid @RequestBody Coach coach){
 		Integer id=null;
 		CoachDTO coach1=mapper.map(coach, CoachDTO.class);
 		
@@ -40,7 +43,7 @@ public class CoachResource {
 		return new ResponseEntity<Integer>(id,new HttpHeaders(),HttpStatus.CREATED);
 	}
 	@PostMapping(value="/create",params="v=2")
-	public ResponseEntity<Integer> createCoachv2(@RequestBody CoachDTO coach){
+	public ResponseEntity<Integer> createCoachv2(@Valid @RequestBody CoachDTO coach){
 		Integer id=null;
 //		CoachDTO coach1=mapper.map(coach, CoachDTO.class);
 		
@@ -51,47 +54,47 @@ public class CoachResource {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<?>coachLogin(@RequestBody Login login)
+	public ResponseEntity<?>coachLogin(@Valid @RequestBody Login login)throws CoachNotFoundException
 	{
 		
 		Boolean log=false;
-		try {
+//		try {
 			log=coachService.loginCoach(login);
-		}
-		catch(Exception ex)
-		{
-			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-		}
+//		}
+//		catch(Exception ex)
+//		{
+//			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+//		}
 		return new ResponseEntity<Boolean>(log,new HttpHeaders(),HttpStatus.OK);
 		
 	}
 	
 	@GetMapping(value="/{coachId}")
-	public ResponseEntity<Coach> getCoachById(@PathVariable("coachId") Integer coachId )
+	public ResponseEntity<Coach> getCoachById(@PathVariable("coachId") Integer coachId )throws CoachNotFoundException
 	{
 //		System.out.println("get coach "+coachId);
 		CoachDTO coach=null;
-		try {
+//		try {
 			coach=coachService.getCoachById(coachId);
-		}
-		catch(Exception ex)
-		{
-			return  ResponseEntity.notFound().build();
-		}
+//		}
+//		catch(Exception ex)
+//		{
+//			return  ResponseEntity.notFound().build();
+//		}
 		return new ResponseEntity<Coach>(mapper.map(coach, Coach.class),new HttpHeaders(),HttpStatus.FOUND);
 	}
 	@GetMapping(value="/{coachId}",params="v=2")
-	public ResponseEntity<CoachDTO> getCoachByIdv2(@PathVariable("coachId") Integer coachId )
+	public ResponseEntity<CoachDTO> getCoachByIdv2(@PathVariable("coachId") Integer coachId )throws CoachNotFoundException
 	{
 		System.out.println("get coach "+coachId);
 		CoachDTO coach=null;
-		try {
+//		try {
 			coach=coachService.getCoachById(coachId);
-		}
-		catch(Exception ex)
-		{
-			return  ResponseEntity.notFound().build();
-		}
+//		}
+//		catch(Exception ex)
+//		{
+//			return  ResponseEntity.notFound().build();
+//		}
 		return new ResponseEntity<CoachDTO>(coach,new HttpHeaders(),HttpStatus.FOUND);
 	}
 	
@@ -103,17 +106,17 @@ public class CoachResource {
 	}
 	
 	@GetMapping("/booking/{coachId}")
-	public ResponseEntity<?> getBooking(@PathVariable("coachId") Integer coachId){
+	public ResponseEntity<?> getBooking(@PathVariable("coachId") Integer coachId)throws CoachNotFoundException{
 		
 		List<BookingDTO> booking=null;
 		
-		try {
+//		try {
 			booking=coachService.getBookingByCoachId(coachId);
-		}
-		catch(Exception ex)
-		{
-			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-		}		
+//		}
+//		catch(Exception ex)
+//		{
+//			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+//		}		
 		
 		return new ResponseEntity<List<BookingDTO>>(booking,new HttpHeaders(),HttpStatus.OK);
 	}

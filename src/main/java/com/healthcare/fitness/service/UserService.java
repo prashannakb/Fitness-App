@@ -5,13 +5,13 @@ import java.util.List;
 import com.healthcare.fitness.entity.dto.BookingDTO;
 import com.healthcare.fitness.entity.dto.Login;
 import com.healthcare.fitness.entity.dto.UserDTO;
+import com.healthcare.fitness.exception.UserNotFoundException;
 
 public interface UserService {
 	
 	Integer createUser(UserDTO user);
-	Boolean loginUser(Login login)throws Exception;
-	UserDTO getUserById(Integer userId)throws Exception;
-	
-	List<BookingDTO> getBookingByUserId(Integer userId)throws Exception;
+	Boolean loginUser(Login login)throws UserNotFoundException;
+	UserDTO getUserById(Integer userId)throws UserNotFoundException;
+	List<BookingDTO> getBookingByUserId(Integer userId)throws UserNotFoundException;
 
 }

@@ -18,7 +18,11 @@ import com.healthcare.fitness.entity.Booking;
 import com.healthcare.fitness.entity.dto.BookingDTO;
 import com.healthcare.fitness.entity.dto.ErrorMessage;
 import com.healthcare.fitness.exception.BookingIdNotFoundException;
+import com.healthcare.fitness.exception.CoachNotFoundException;
+import com.healthcare.fitness.exception.UserNotFoundException;
 import com.healthcare.fitness.service.BookingService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -36,7 +40,7 @@ public class BookingRestController {
 		return ResponseEntity.badRequest().body(msg);
 	}
 	@PostMapping("/coach/{coachId}/user/{userId}")
-	public ResponseEntity<?> appointmentBooking(@RequestBody Booking book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId ){
+	public ResponseEntity<?> appointmentBooking(@Valid @RequestBody Booking book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId ){
 		BookingDTO book1=mapper.map(book,BookingDTO.class);
 		Boolean resp=false;
 		try {
@@ -50,21 +54,21 @@ public class BookingRestController {
 	}
 	
 	@PostMapping("/v2/coach/{coachId}/user/{userId}")
-	public ResponseEntity<?> appointmentBookingv2(@RequestBody BookingDTO book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId ){
+	public ResponseEntity<?> appointmentBookingv2(@Valid @RequestBody BookingDTO book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId )throws BookingIdNotFoundException,UserNotFoundException,CoachNotFoundException {
 //		BookingDTO book1=mapper.map(book,BookingDTO.class);
 		Boolean resp=false;
-		try {
+//		try {
 			 resp=bookingService.appointmentBooking(coachId, UserId, book);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+////			e.printStackTrace();
+//			return ResponseEntity.badRequest().body(e.getMessage());
+//		}
 		return new ResponseEntity<Boolean>(resp,new HttpHeaders(),HttpStatus.OK); 
 	}
 	
 	@PutMapping("/{bookingId}")
-	public ResponseEntity<?> rescheduleBooking(@RequestBody Booking book,@PathVariable("bookingId") Integer bookingId){
+	public ResponseEntity<?> rescheduleBooking(@Valid @RequestBody Booking book,@PathVariable("bookingId") Integer bookingId){
 		BookingDTO book1=mapper.map(book,BookingDTO.class);
 		Boolean resp=false;
 		try {
@@ -79,7 +83,7 @@ public class BookingRestController {
 	}
 	
 	@PutMapping(value="/{bookingId}",headers="API-Version=2")
-	public ResponseEntity<?> rescheduleBooking(@RequestBody BookingDTO book,@PathVariable("bookingId") Integer bookingId) throws BookingIdNotFoundException{
+	public ResponseEntity<?> rescheduleBooking(@Valid @RequestBody BookingDTO book,@PathVariable("bookingId") Integer bookingId) throws BookingIdNotFoundException{
 //		BookingDTO book1=mapper.map(book,BookingDTO.class);
 		Boolean resp=false;
 //		try {
