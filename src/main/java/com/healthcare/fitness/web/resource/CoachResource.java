@@ -25,6 +25,8 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/coach")
+//@OpenAPIDefinition(info = @Info(title = "Controller layer for coach related operations",
+//version = "3.14"))
 public class CoachResource {
 	
 	@Autowired
@@ -32,6 +34,7 @@ public class CoachResource {
 	
 	@Autowired
 	private ModelMapper mapper;
+//	@ApiResponse(description="Get method for fetching customer details")
 	@PostMapping("/create")
 	public ResponseEntity<Integer> createCoach(@Valid @RequestBody Coach coach){
 		Integer id=null;

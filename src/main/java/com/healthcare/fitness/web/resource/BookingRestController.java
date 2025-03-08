@@ -26,6 +26,8 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/booking")
+//@OpenAPIDefinition(info = @Info(title = "Controller layer for booking related operations",
+//version = "3.14"))
 public class BookingRestController {
 	@Autowired
 	private BookingService bookingService;
@@ -39,6 +41,7 @@ public class BookingRestController {
 		msg.setMessage(error.getMessage());
 		return ResponseEntity.badRequest().body(msg);
 	}
+//	@ApiResponse(description="Get method for fetching customer details")
 	@PostMapping("/coach/{coachId}/user/{userId}")
 	public ResponseEntity<?> appointmentBooking(@Valid @RequestBody Booking book,@PathVariable("coachId") Integer coachId,@PathVariable("userId") Integer UserId ){
 		BookingDTO book1=mapper.map(book,BookingDTO.class);
